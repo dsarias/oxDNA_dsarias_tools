@@ -17,3 +17,17 @@ def calculate_distance(data: ParticleData, particles: list):
         distance[t] = sqrt(distance[t])
 
     return distance
+
+def ask_particles():
+    # particle numbers input handling
+    particles_input = input("Enter id of the particles separated by a space:")
+    particles_needed = particles_input.split(" ")
+    particles_needed = list(dict.fromkeys(particles_needed))  # to get rid of duplicates
+    try:
+        particles_needed.remove('')
+    except ValueError:
+        pass
+    particles_needed = [int(i) for i in particles_needed]  # converting from string to int
+    print("Particles: ", particles_needed)
+    return particles_needed
+

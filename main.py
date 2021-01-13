@@ -2,10 +2,12 @@
 from oxdna_data_extractor import extract_data
 from oxDNA_data_plotter import *
 from ParticleData import *
+from dsa_utilities import ask_particles
 # other modules
 from tkinter.filedialog import askopenfilename
 
 # TODO extract the filename and save to the class too
+# TODO get rid of tk file dialog 
 
 def run_extractor():
     # ask for oxDNA file
@@ -13,17 +15,8 @@ def run_extractor():
     # file_name = "testFile.txt"  # for testing purposes
     print(file_name)  # for confirmation
 
-    # particle numbers input handling
-    particles_input = input("Enter id of the particles separated by a space:")
-    particles_needed = particles_input.split(" ")
-    particles_needed = list(dict.fromkeys(particles_needed))  # to get rid of duplicates
-    try:
-        particles_needed.remove('')
-    except ValueError:
-        pass
-    particles_needed = [int(i) for i in particles_needed]  # converting from string to int
-    print("Particles: ", particles_needed)
-
+    particles_needed = ask_particles()
+    
     # extract particle location data from oxDNA file
     success_status: bool  # whether data extraction worked
     data: ParticleData  # ParticleData object containing data for all particles

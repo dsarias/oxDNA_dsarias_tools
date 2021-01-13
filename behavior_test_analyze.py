@@ -3,14 +3,47 @@ import os
 import statistics
 import matplotlib.pyplot as plt
 import csv
+import pickle
 
 from oxdna_data_extractor import extract_data
-from dsa_utilities import calculate_distance
+from dsa_utilities import calculate_distance, ask_particles
 
 # USER INPUTS
-particles_needed = [376, 1588]  # the particle number for the two particles at the end of the legs
-grip_separation = [i/2 for i in range(6, 40, 1)]
-os.chdir("/home/naitsaves/Documents/OricepsSimulations/oriceps3nm_v3/r3/oriceps3nm_v3r3_oxBehavior2/output")
+temp_bool = True;
+while (temp_bool):
+
+    temp_response = input("Would you like to use last run settings? (y/n)")
+    if temp_response == "y" or temp_response == "Y":
+        #load previous settings and run
+
+        with open('.saved_behavior_settings','rb') as file:
+            particles_needed = pickle.load(file)
+            data_path = pickle.load(file)
+
+        temp_bool = False
+    elif temp_response == "n" or temp_response == "N":
+        #ask for new inputs and save for future
+
+        particles_needed = ask_particles()
+
+        if len(particles_needed) > 2:
+            continue
+
+        data_path = input("Enter path of data:")
+ 
+                
+        with open('.saved_behavior_settings', 'wb') as file:
+            #picklying (?) in file for next run
+            pickle.dump(particles_needed, file)
+            pickle.dump(data_path, file )
+
+        temp_bool = False
+    else:
+        continue
+
+#particles_needed = [376, 1588]  # the particle number for the two particles at the end of the legs
+grip_separation = [i for i in range(20, 35, 1)] #TODO: make this automatic
+os.chdir(data_path)
 
 # Gheto way to get the grip separation list in the order that I want
 grip_separation = [str(i) for i in grip_separation]
@@ -26,7 +59,6 @@ for i, filename in enumerate(all_files):  # parsing through files and picking ou
     if ".dat" in filename and "energy" not in filename:
         traj_file_names.append(filename)
         print(filename)
-
 
 # Extracting data from all the trajectory files:
 data = []  # will contain position data for the needed particles within ParticleData classes
@@ -51,6 +83,9 @@ for separation_data in leg_separation:
     avg_separation.append(statistics.mean(separation_data))
     std_separation.append(statistics.stdev(separation_data))
 
+print(len(grip_separation), len(avg_separation), len(std_separation))
+print(grip_separation)
+#TODO: move plotting to another function?
 # Plot the behavior
 # plotting the points
 plt.errorbar(grip_separation, avg_separation, std_separation, marker='o', linestyle="None")
