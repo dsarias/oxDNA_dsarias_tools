@@ -12,13 +12,37 @@ from dsa_utilities import calculate_distance, ask_particles
 temp_bool = True;
 while (temp_bool):
 
-    temp_response = input("Would you like to use last run settings? (y/n)")
-    if temp_response == "y" or temp_response == "Y":
+    #TODO make this a function
+    #path
+    temp_response = input("Would you like to use last data path? (y/n)")
+    if temp_response == "y" or temp_response == "Y" or temp_response == "":
+        #load previous path from pickled file
+
+        with open('.saved_behavior_settings_path','rb') as file:
+            data_path = pickle.load(file)
+
+        temp_bool = False
+    elif temp_response == "n" or temp_response == "N":
+        #ask for new inputs and save for future
+
+        data_path = input("Enter path of data:")
+ 
+                
+        with open('.saved_behavior_settings_path', 'wb') as file:
+            #picklying (?) in file for next run
+            pickle.dump(data_path, file )
+
+        temp_bool = False
+    else:
+        continue
+
+    #base numbers
+    temp_response = input("Would you like to use last base numbers? (y/n)")
+    if temp_response == "y" or temp_response == "Y" or temp_response == "":
         #load previous settings and run
 
-        with open('.saved_behavior_settings','rb') as file:
+        with open('.saved_behavior_settings_bases','rb') as file:
             particles_needed = pickle.load(file)
-            data_path = pickle.load(file)
 
         temp_bool = False
     elif temp_response == "n" or temp_response == "N":
@@ -28,37 +52,42 @@ while (temp_bool):
 
         if len(particles_needed) > 2:
             continue
-
-        data_path = input("Enter path of data:")
  
                 
-        with open('.saved_behavior_settings', 'wb') as file:
+        with open('.saved_behavior_settings_bases', 'wb') as file:
             #picklying (?) in file for next run
             pickle.dump(particles_needed, file)
-            pickle.dump(data_path, file )
 
         temp_bool = False
     else:
         continue
 
-#particles_needed = [376, 1588]  # the particle number for the two particles at the end of the legs
-grip_separation = [i for i in range(20, 35, 1)] #TODO: make this automatic
-os.chdir(data_path)
+
+#grip_separation = [i for i in range(20, 35, 1)] #TODO: make this automatic
+os.chdir(data_path) #changing working directory to data directory
 
 # Gheto way to get the grip separation list in the order that I want
-grip_separation = [str(i) for i in grip_separation]
-grip_separation.sort()
-grip_separation = [float(i) for i in grip_separation]
+# grip_separation = [str(i) for i in grip_separation]
+# grip_separation.sort()
+# grip_separation = [float(i) for i in grip_separation]
 
 all_files = os.listdir()
 all_files.sort()
 
 traj_file_names = []  # will contain the names of the trajectory files in the folder
-
+grip_separation = [] #will contain the values for the handle separation
 for i, filename in enumerate(all_files):  # parsing through files and picking our trajectory files
     if ".dat" in filename and "energy" not in filename:
-        traj_file_names.append(filename)
-        print(filename)
+        traj_file_names.append(filename) #saves the file name for all trajectory files
+
+        #to get the handle separations for each trajectory
+        hend_index = filename.find("nm", 0, len(filename)) # h values has to be before "nm"
+        hstart_index = filename.find("_", hend_index - 4, hend_index) # finding starting index - assuming that h will not be > 1000 
+        #TODO use expection handling to have a dynamic max h value
+
+        grip_separation.append(int(filename[hstart_index+1:hend_index]))
+
+print("Number of trajectory files found:", len(traj_file_names))
 
 # Extracting data from all the trajectory files:
 data = []  # will contain position data for the needed particles within ParticleData classes
