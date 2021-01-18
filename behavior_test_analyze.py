@@ -140,6 +140,7 @@ plt.show()
 with open('analysis_data.csv', mode='w') as export_file:
     employee_writer = csv.writer(export_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
+    employee_writer.writerow(particles_needed)
     employee_writer.writerow(grip_separation)
     employee_writer.writerow(avg_separation)
     employee_writer.writerow(std_separation)
