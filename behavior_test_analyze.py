@@ -82,10 +82,15 @@ for i, filename in enumerate(all_files):  # parsing through files and picking ou
 
         #to get the handle separations for each trajectory
         hend_index = filename.find("nm", 0, len(filename)) # h values has to be before "nm"
-        hstart_index = filename.find("_", hend_index - 4, hend_index) # finding starting index - assuming that h will not be > 1000 
-        #TODO use expection handling to have a dynamic max h value
 
-        grip_separation.append(int(filename[hstart_index+1:hend_index]))
+        hstart_index = -1 # initiating value 
+        char_back = 1 #number of characters before "nm" that find should start looking
+        while hstart_index == -1:
+            hstart_index = filename.find("_", hend_index - char_back, hend_index) # finding starting index - assuming that h will not be > 1000 
+            char_back += 1
+
+
+        grip_separation.append(float(filename[hstart_index+1:hend_index]))
 
 print("Number of trajectory files found:", len(traj_file_names))
 
@@ -112,8 +117,8 @@ for separation_data in leg_separation:
     avg_separation.append(statistics.mean(separation_data))
     std_separation.append(statistics.stdev(separation_data))
 
-print(len(grip_separation), len(avg_separation), len(std_separation))
-print(grip_separation)
+#print(len(grip_separation), len(avg_separation), len(std_separation))
+#print(grip_separation)
 #TODO: move plotting to another function?
 # Plot the behavior
 # plotting the points
