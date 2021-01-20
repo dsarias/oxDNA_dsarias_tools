@@ -43,3 +43,7 @@ Thumbs.db
 *venv*
 *testFile.txt
 .idea*
+.saved_behavior_settings
+.saved_behavior_settings_bases
+.saved_behavior_settings_path
+.*
