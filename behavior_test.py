@@ -61,46 +61,48 @@ def write_input(steps, input_config, output_conf, output_traj):
 ##############################
 ####  PROGRAM PARAMETERS  ####
 ##############################
-interaction_type = DNA2
-salt_concentration = 0.5
-sim_type = MD
 backend = CUDA
 backend_precision = mixed
-#debug = 1
-seed = 55977
+CUDA_list = verlet
+use_edge = 1
+interaction_type = DNA2
+sim_type = MD #Defaults to MD so not needed
 
 ##############################
 ####    SIM PARAMETERS    ####
 ##############################
 steps = {}
 newtonian_steps = 103
-diff_coeff = 2.5
-thermostat = john
+diff_coeff = 2.50
+thermostat = brownian
 
-list_type = cells
+T = 300K
+dt = 0.005
+verlet_skin = 0.05
+max_density_multiplier = 5
 
-T = 295.000000 K
-dt = 0.003
-verlet_skin = 0.5
-max_backbone_force = 10
+salt_concentration = 1.0
 
 ##############################
 ####    INPUT / OUTPUT    ####
 ##############################
-topology = oriceps3nm_v3r3-oxdna.top
+topology = prova.top
 conf_file = output/{}
 
 lastconf_file = output/{}
-trajectory_file = output/{}
-
 log_file = output/log.log
+
+trajectory_file = output/{}
+print_conf_interval = 4000
+
+
+energy_file = output/energy.dat
+print_energy_every = 1000
 
 refresh_vel = 1
 no_stdout_energy = 1
 restart_step_counter = 1
-energy_file = output/energy.dat
-print_conf_interval = 4000
-print_energy_every = 20000
+
 time_scale = linear
 box_type=orthogonal
 
@@ -118,20 +120,20 @@ r0_initial = 3  # initial grip distance
 steps_relax = 200000  # steps in relaxation step
 steps = 400000  # steps in testing step
 
-input_config_file = "../oriceps3nm_v3r3-oxdna_closeGrip.last.conf"  # the initial input config file
+input_config_file = "../hclose.last.conf"  # the initial input config file
 
 grip_distances = [i/2 for i in range(6, 40, 1)]
 
 for r0 in grip_distances:
-    os.system('echo "r0 = {}", date +"%T"'.format(r0))
-    output_config_file = "oriceps3nm_v3r3-oxdna_{}nm.last.conf".format(r0)  # output last config file
-    output_traj_file = "oriceps3nm_v3r3-oxdna_{}nm.dat".format(r0)  # output last config file
+    os.system("echo 'r0 = {}'".format(r0))
+    output_config_file = "gq_v1_r2_{}nm.last.conf".format(r0)  # output last config file
+    output_traj_file = "gq_v1_r2_{}nm.dat".format(r0)  # output last config file
 
     write_mutual_trap(r0)  # mutual trap force file
 
     # relaxation phase
     os.system("echo 'Running relaxation step'")
-
+    os.system('date +"%T"')
     write_input(steps_relax, input_config_file, output_config_file, output_traj_file)
     os.system("oxDNA input")
 
