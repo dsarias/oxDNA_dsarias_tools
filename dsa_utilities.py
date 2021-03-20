@@ -5,6 +5,7 @@ from math import *
 
 def calculate_distance(data: ParticleData, particles: list):
     # Calculates the distance between two particles
+    # Converts from simulation units to real units (nm)
     p1 = [data.get_x(particles[0]), data.get_y(particles[0]), data.get_z(particles[0])]
     p2 = [data.get_x(particles[1]), data.get_y(particles[1]), data.get_z(particles[1])]
     num_points = len(p1[0])
@@ -16,7 +17,11 @@ def calculate_distance(data: ParticleData, particles: list):
             distance[t] += (p1[i][t] - p2[i][t]) ** 2
         distance[t] = sqrt(distance[t])
 
-    return distance
+    #Convertion to real units:
+
+    distance_nm = [x*0.8518 for x in distance]
+
+    return distance_nm
 
 def ask_particles():
     # particle numbers input handling
